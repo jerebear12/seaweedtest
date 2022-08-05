@@ -64,12 +64,11 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-A C# graphical user interface made to interact with a test seaweedfs instance.
-SeaweedTest uses http requests to upload and download files from seaweedfs.
-SeaweedTest allows for viewing of files and user based access and storage.
+A C# graphical user interface made to interact with a test seaweedfs instance.<br>
+SeaweedTest uses http requests to upload and download files from seaweedfs.<br>
+SeaweedTest allows for viewing of files with user based access and storage.<br>
 SeaweedTest does not support deletion of files currently.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -79,8 +78,6 @@ C#
 Windows Forms
 RestSharp
 
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- GETTING STARTED -->
@@ -100,18 +97,18 @@ These are the instructions for installation and operation
 
 You will need to install the python flask server to log in and authenticate the user:
 
+### Installation
+
+git clone this repo!
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ### Python Server(Authentication API)
 in the flask-server folder run:
 * pip
     ```sh
     pip install -r requirements.txt
     ```
-
-### Installation
-
-git clone this repo!
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- USAGE EXAMPLES -->
