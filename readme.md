@@ -30,7 +30,7 @@
 <h3 align="center">SeaweedTest</h3>
 
   <p align="center">
-    A C# graphical user interface made to interact with a test seaweedfs instance
+    A C# graphical user interface made to interact with a test SeaweedFS instance
     <br />
     <a href="https://github.com/jerebear12/seaweedtest"><strong>View the Code »</strong></a>
   </p>
@@ -64,7 +64,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-A C# graphical user interface made to interact with a test seaweedfs instance.<br>
+A C# graphical user interface made to interact with a test [SeaweedFS](https://github.com/seaweedfs/seaweedfs) instance.<br>
 SeaweedTest uses http requests to upload and download files from seaweedfs.<br>
 SeaweedTest allows for viewing of files with user based access and storage.<br>
 SeaweedTest does not support deletion of files currently.
