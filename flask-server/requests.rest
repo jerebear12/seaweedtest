@@ -1,0 +1,36 @@
+####### REST Client in VS Code #######
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client #
+
+### Sign Up
+POST http://127.0.0.1:5000/signup
+Content-Type: application/json
+
+{
+    "username": "example192",
+    "email": "exampleemail@gmail.com",
+    "password": "examplepass"
+}
+
+### Log In
+
+POST http://127.0.0.1:5000/login
+Content-Type: application/json
+
+{
+    "username": "example192",
+    "password": "examplepass"
+}
+
+### Get Users
+
+http://127.0.0.1:5000/users
+
+
+### Test Refresh Token
+
+POST http://127.0.0.1:5000/refresh
+Content-Type: application/json
+
+{
+    "refresh_token": ""
+}
