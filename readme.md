@@ -74,9 +74,11 @@ SeaweedTest does not support deletion of files currently.
 
 ### Built With
 
-C#
-Windows Forms
-RestSharp
+- C#
+- Windows Forms
+- RestSharp
+- Flask
+- SqlAlchemy
 
 
 
