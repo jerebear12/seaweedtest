@@ -111,7 +111,7 @@ in the flask-server folder run:
     ```sh
     pip install -r requirements.txt
     ```
-
+This will install all python packages needed to run app.py
 
 <!-- USAGE EXAMPLES -->
 ## Usage
