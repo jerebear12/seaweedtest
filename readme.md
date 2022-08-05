@@ -103,8 +103,6 @@ You will need to install the python flask server to log in and authenticate the 
 
 git clone this repo!
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ### Python Server(Authentication API)
 in the flask-server folder run:
 * pip
