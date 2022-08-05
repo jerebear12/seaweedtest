@@ -100,6 +100,7 @@ These are the instructions for installation and operation
 
 You will need to install the python flask server to log in and authenticate the user:
 
+# Python Server(Authentication API)
 in the flask-server folder run:
 * pip
     ```sh
