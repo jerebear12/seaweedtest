@@ -461,7 +461,7 @@ namespace SeaweedTestMk2
                                         pbLoading.PerformStep();
                                         pbLoading.PerformStep();
                                         // Open new page
-                                        FileManager fileManager = new FileManager(resonseToken.token, filer_ip, folder_name);
+                                        FileManager fileManager = new FileManager(retrievedToken, filer_ip, folder_name);
                                         this.Hide();
                                         fileManager.Show();
                                     }
@@ -518,6 +518,8 @@ namespace SeaweedTestMk2
                 // File has not been created yet
                 Debug.WriteLine("File was not created");
                 // Go to log in page
+                pnlLogin.BringToFront();
+                btnSettings.BringToFront();
             }
             pbLoading.PerformStep();
             pnlLoading.SendToBack();
