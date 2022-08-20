@@ -18,7 +18,7 @@ namespace SeaweedTestMk2
     public class Chunk
     {
         public string? file_id { get; set; }
-        public int? size { get; set; }
+        public long? size { get; set; }
         public long? mtime { get; set; }
         public string? e_tag { get; set; }
         public Fid? fid { get; set; }
@@ -64,7 +64,7 @@ namespace SeaweedTestMk2
     public class FilerPostResp
     {
         public string? name { get; set; }
-        public int? size { get; set; }
+        public long? size { get; set; }
         public string? fid { get; set; }
         public string? url { get; set; }
     }
@@ -73,14 +73,14 @@ namespace SeaweedTestMk2
     {
         public string? fid { get; set; }
         public int? offset { get; set; }
-        public int? size { get; set; }
+        public long? size { get; set; }
     }
 
     public class ChunkManifest
     {
         public string? name { get; set; }
         public string? mime { get; set; }
-        public int? size { get; set; }
+        public long? size { get; set; }
         public List<ChunkInfo>? chunks { get; set; }
     }
 
@@ -101,7 +101,7 @@ namespace SeaweedTestMk2
         public object? GroupNames { get; set; }
         public string? SymlinkTarget { get; set; }
         public string? Md5 { get; set; }
-        public int? FileSize { get; set; }
+        public long? FileSize { get; set; }
         public object? Extended { get; set; }
         public List<Chunk>? chunks { get; set; }
         public object? HardLinkId { get; set; }
