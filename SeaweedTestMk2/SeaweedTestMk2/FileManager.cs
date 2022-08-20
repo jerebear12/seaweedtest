@@ -26,6 +26,7 @@ namespace SeaweedTestMk2
         string filePath = "";
         List<FileNameData> uploadedFiles = new List<FileNameData>();
         int chunkSize = 10000 * 1024;
+        bool isPaused = false;
         public FileManager(string JWT, string filer_ip_address, string storage_folder_name)
         {
             InitializeComponent();
@@ -34,12 +35,11 @@ namespace SeaweedTestMk2
             token = JWT;
             filer_ip = filer_ip_address;
             folder_name = storage_folder_name;
-            DownloadAll();
-            ShowAllImages();
         }
 
+        public delegate FilerPostResp AsyncCaller(string filePath, Progress<int> progress);
 
-        private void btnChoose_Click(object sender, EventArgs e)
+        private async void btnChoose_Click(object sender, EventArgs e)
         {
             // File
             if (rbFile.Checked)
@@ -47,22 +47,17 @@ namespace SeaweedTestMk2
                 if (ofdFile.ShowDialog() == DialogResult.OK)
                 {
                     //Debug.WriteLine(ofdFile.FileName);
-                    if (File.Exists(ofdFile.FileName)) 
+                    if (File.Exists(ofdFile.FileName))
                     {
-                        filePath = ofdFile.FileName;
-                        FilerPostResp uploadResponse = HandleFile(filePath);  // Switch to handle file which chunks file and loops through the chunks
-                        if (uploadResponse == null)
+                        if (isPaused == true)
                         {
-                            AlertUser("Failed to upload file", "error");
-                            Debug.WriteLine("Failed to upload file:");
-                            Debug.WriteLine(uploadResponse);
+                            AlertUser("Uploads are Paused", "error");
                             return;
                         }
-                        if (uploadResponse.name != null)
+                        FilerPostResp resp = await CallHandleFile(ofdFile.FileName);
+                        if (resp != null)
                         {
-                            txtFileInfo.Text = "";
-                            AlertUser("Upload Successful", "success");
-                            return;
+
                         }
                     }
                     else
@@ -80,11 +75,11 @@ namespace SeaweedTestMk2
                     if (Directory.Exists(fbdFolder.SelectedPath))
                     {
                         string folderName = fbdFolder.SelectedPath;
-                        txtFileInfo.Text = folderName;
+                        //txtFileInfo.Text = folderName;
                         // Get Folder info
                         DirectoryInfo dirInfo = new DirectoryInfo(folderName);
                         DeepUpload(dirInfo, token);
-                        txtFileInfo.Text = "";
+                        //txtFileInfo.Text = "";
                         // Alert User
                         AlertUser("Upload Successful", "success");
                     }
@@ -112,7 +107,20 @@ namespace SeaweedTestMk2
             }
         }
 
-        public void DeepUpload(DirectoryInfo dirInfo, string token)
+        private async Task AsyncAlert(string msg, string type)
+        {
+            Action alert = () =>
+            {
+                AlertUser(msg, type);
+            };
+            Action invoke = () =>
+            {
+                this.BeginInvoke(alert);
+            };
+            await Task.FromResult(Task.Run(invoke));
+        }
+
+        public async void DeepUpload(DirectoryInfo dirInfo, string token)
         {
             // Loop through all folders and call function again to recursively upload all files
             foreach (DirectoryInfo dir in dirInfo.GetDirectories())
@@ -122,7 +130,7 @@ namespace SeaweedTestMk2
             // Loop through files
             foreach (FileInfo file in dirInfo.GetFiles())
             {
-                HandleFile(file.FullName);
+                FilerPostResp resp = await CallHandleFile(file.FullName);
             }
         }
 
@@ -217,23 +225,30 @@ namespace SeaweedTestMk2
                 IEnumerable<string> fileIds = CreateFileLists(filerMetaData);
                 // Compare uploaded files with GetFileNames
                 // For each obj containing fileid and filename in list
-                foreach (FileNameData file in uploadedFiles)
+                try  // uploadedFiles may break because of modifications during access
                 {
-                    // Skip adding file if it exists/is downloaded
-                    if (!File.Exists("files\\" + file.FileName))
+                    foreach (FileNameData file in uploadedFiles)
                     {
-                        // Loop through fileid in list of file ids
-                        foreach (string fileId in fileIds)
+                        // Skip adding file if it exists/is downloaded
+                        if (!File.Exists("files\\" + file.FileName))
                         {
-                            // If fileId matches the current FileID in the FileNameData obj
-                            if (file.FileId == fileId)
+                            // Loop through fileid in list of file ids
+                            foreach (string fileId in fileIds)
                             {
-                                // Add obj to list
-                                // This file is now marked as needing to be downloaded
-                                fileNameDatas.Add(file);
+                                // If fileId matches the current FileID in the FileNameData obj
+                                if (file.FileId == fileId)
+                                {
+                                    // Add obj to list
+                                    // This file is now marked as needing to be downloaded
+                                    fileNameDatas.Add(file);
+                                }
                             }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
                 }
             }
             else
@@ -243,84 +258,102 @@ namespace SeaweedTestMk2
             return fileNameDatas;
         }
 
-        // Changed volume impl to filer
-        private void DownloadAll()
+        public async Task<Task> CallDownload()
         {
-            if (!Directory.Exists("files"))
+            Action download = async () =>
             {
-                Directory.CreateDirectory("files");
-            }
-            FilerGetResp filerMetaData = GetFolderInfoFromFiler();
-            if (filerMetaData != null)
+                await DownloadAll().GetAwaiter().GetResult();
+                //ShowAllImages();
+            };
+            return Task.FromResult(Task.Run(download));
+        }
+
+        // Changed volume impl to filer
+        private async Task<Task> DownloadAll()
+        {
+            return Task.FromResult(Task.Run(() =>
             {
-                // List of files
-                List<FileNameData> fileDataObjs = CreateNeededFileList();
-                if (fileDataObjs.Count > 0)
+                if (!Directory.Exists("files"))
                 {
-                    // Loop through file objects
-                    foreach (FileNameData file in fileDataObjs)
+                    Directory.CreateDirectory("files");
+                }
+                FilerGetResp filerMetaData = GetFolderInfoFromFiler();
+                if (filerMetaData != null)
+                {
+                    // List of files
+                    List<FileNameData> fileDataObjs = CreateNeededFileList();
+                    if (fileDataObjs.Count > 0)
                     {
-                        // Abort if file is already downloaded
-                        // Mildly redundant
-                        // DownloadAll() already has this check
-                        if (!File.Exists("files\\" + file.FileName))
+                        // Loop through file objects
+                        foreach (FileNameData file in fileDataObjs)
                         {
-                            using (var client = new HttpClient())
+                            // Abort if file is already downloaded
+                            // Mildly redundant
+                            // DownloadAll() already has this check
+                            if (!File.Exists("files\\" + file.FileName))
                             {
-                                // Testing adding headers to request to filer
-                                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                                try
+                                using (var client = new HttpClient())
                                 {
-                                    string url;
-                                    // If extension is .json, file is a manifest file
-                                    if (Path.GetExtension(file.FileName) == ".json")
+                                    // Testing adding headers to request to filer
+                                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                                    try
                                     {
-                                        // Add resolveManifest parameter to get all file chunks
-                                        url = filer_ip + "/" + folder_name + "/" + file.FileName + "?resolveManifest=true";
-                                    }
-                                    else
-                                    {
-                                        // Use default
-                                        url = filer_ip + "/" + folder_name + "/" + file.FileName;
-                                    }
-                                    using (var s = client.GetStreamAsync(url))  // Filer IP 
-                                    {
-                                        using (var fs = new FileStream(path: "files/" + file.FileName, FileMode.Create))
+                                        string url;
+                                        // If extension is .json, file is a manifest file
+                                        if (Path.GetExtension(file.FileName) == ".json")
                                         {
-                                            s.Result.CopyTo(fs);
+                                            // Add resolveManifest parameter to get all file chunks
+                                            url = filer_ip + "/" + folder_name + "/" + file.FileName + "?resolveManifest=true";
+                                        }
+                                        else
+                                        {
+                                            // Use default
+                                            url = filer_ip + "/" + folder_name + "/" + file.FileName;
+                                        }
+                                        using (var s = client.GetStreamAsync(url))  // Filer IP 
+                                        {
+                                            using (var fs = new FileStream(path: "files/" + file.FileName, FileMode.Create))
+                                            {
+                                                s.Result.CopyTo(fs);
+                                            }
                                         }
                                     }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Debug.WriteLine("Error downloading file: ");
-                                    Debug.WriteLine(ex.Message);
+                                    catch (Exception ex)
+                                    {
+                                        Debug.WriteLine("Error downloading file: ");
+                                        Debug.WriteLine(ex.Message);
+                                    }
                                 }
                             }
+                            else
+                            {
+                                Debug.WriteLine("File downloaded in DownloadAll if statement");
+                            }
                         }
-                        else
-                        {
-                            Debug.WriteLine("File downloaded in DownloadAll if statement");
-                        }
+                    }
+                    else
+                    {
+                        // Display info
+                        // Not technically an error
+                        Debug.WriteLine("No fileIds from GetFileNames");
                     }
                 }
                 else
                 {
-                    // Display info
-                    // Not technically an error
-                    Debug.WriteLine("No fileIds from GetFileNames");
+                    // Display error
+                    Debug.WriteLine("No filerMetaData from GetFileData");
                 }
-            }
-            else
-            {
-                // Display error
-                Debug.WriteLine("No filerMetaData from GetFileData");
-            }
+            }));
         }
 
         private void ShowAllImages()
         {
-            lvImages.Items.Clear();
+            // For async calls
+            Action clearListView = () =>
+            {
+                lvImages.Items.Clear();
+            };
+            this.BeginInvoke(clearListView);
             List<string> ImageExtensions = new List<string> { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG" };
             if (Directory.Exists("files"))
             {
@@ -346,7 +379,11 @@ namespace SeaweedTestMk2
                         newLVI.ImageKey = "other";
                     }
                     // Add to ListView
-                    lvImages.Items.Add(newLVI);
+                    Action addToListView = () =>
+                    {
+                        lvImages.Items.Add(newLVI);
+                    };
+                    this.BeginInvoke(addToListView);
                 }
             }
             else
@@ -354,16 +391,118 @@ namespace SeaweedTestMk2
                 // Create folder
                 Directory.CreateDirectory("files");
                 // Try download
-                DownloadAll();
+                CallDownload();
                 // Try this function again
-                ShowAllImages();
+                //ShowAllImages();
+                btnViewFiles.PerformClick();
             }
         }
+        public async Task<FilerPostResp> CallHandleFile(string filePath)
+        {
+            // Init return variable
+            FilerPostResp resp = null;
+            // Init progress variable to store prgress data and handle callbacks
+            var progress = new Progress<int>(percent =>
+            {
+                pbUpload.Value = pbUpload.Value + percent;
+            });
+            // Split filepath by directory
+            string[] directorySplit = filePath.Split(@"\");
+            // Get file name from path
+            string fileName = directorySplit[directorySplit.Length - 1];
+            // Get file info from Filer
+            FilerGetMetadata metadata = GetFileMetadata(fileName);
+            long fileOffset = 0;
+            FileInfo file = new FileInfo(filePath);
+            fileOffset = file.Length;
+            // If null no file exists yet
+            if (metadata != null)
+            {
+                // Make sure there is a filesize stored to avoid errors
+                if (metadata.FileSize != null)
+                {
+                    // If file stored on server is smaller than the one on the device
+                    if (metadata.FileSize > fileOffset)
+                    {
+                        // Set offset of ProgressBar to server size
+                        fileOffset = (long)metadata.FileSize;
+                        AlertUser("Resuming upload", "success");
+                    }
+                    // Else file is fully uploaded 
+                    else
+                    {
+                        AlertUser("File is Already Uploaded", "error");
+                        ClearProgressBar();
+                        return resp;
+                    }
+                }
+            }
+            InitProgressBar(fileOffset);
+            AsyncCaller caller = HandleFile;
+            // Wait for file to be uploaded while allowing UI thread to update
+            resp = await Task.Run(() => caller(filePath, progress));
+            // Handle response from method
+            if (resp.name == null)
+            {
+                AlertUser("Failed to upload file", "error");
+                Debug.WriteLine("Failed to upload file:");
+                Debug.WriteLine(resp);
+            }
+            if (resp.name == "paused")
+            {
+                AlertUser("Uploads are Paused", "error");
+                ClearProgressBar();
+                return resp;
+            }
+            if (resp.name == "uploaded")
+            {
+                AlertUser("File is Already Uploaded", "error");
+                ClearProgressBar();
+                return resp;
+            }
+            if (resp.name != null)
+            {
+                txtFileInfo.Text = "";
+                AlertUser("Upload Successful", "success");
+            }
+            // Clear progress bar no matter what
+            ClearProgressBar();
+            return resp;
+        }
+        private void InitProgressBar(long total)
+        {
+            int totalMB;
+            double mb = 1024 * 1024;
+            // Convert to mbs to avoid Int64 type in prgress bar
+            totalMB = (int)((double)total / mb);
+            pbUpload.Maximum = totalMB + 1;
+            pbUpload.Visible = true;
+            pbUpload.Update();
+        }
 
-        public FilerPostResp HandleFile(string filePath)
+        private int ProgressBarTick(int amount)
+        {
+            int amountMb;
+            double mb = 1024 * 1024;
+            // Convert to mbs to avoid Int64 type in prgress bar
+            amountMb = (int)((double)amount / mb);
+            return amountMb;
+        }
+
+        private void ClearProgressBar()
+        {
+            pbUpload.Value = 0;
+            pbUpload.Maximum = 100;
+            pbUpload.Visible = false;
+            pbUpload.Update();
+        }
+
+        public FilerPostResp HandleFile(string filePath, IProgress<int> progress)
         {
             // Response variable
             FilerPostResp response = new FilerPostResp();
+            // Task alert for async alerts
+            Task alert;
             // Split path by directory
             string[] directorySplit = filePath.Split(@"\");
             // Get file name from path
@@ -383,7 +522,7 @@ namespace SeaweedTestMk2
             const int BUFFER_SIZE = 1024 * 1024 * 10;  // 10mb in byte form
             byte[] buffer = new byte[BUFFER_SIZE];
             // Offset
-            int offset = 0;  // Current bytes read - location to read from
+            long offset = 0;  // Current bytes read - location to read from
             // Number of chunk bring read
             int chunkNum = 1;
             // See if file exists
@@ -392,7 +531,7 @@ namespace SeaweedTestMk2
             {
                 if (metadata.FileSize > 0)
                 {
-                    offset += (int)metadata.FileSize;
+                    offset += (long)metadata.FileSize;
                 }
             }
             using (Stream input = File.OpenRead(filePath))
@@ -400,17 +539,37 @@ namespace SeaweedTestMk2
                 // If file is fully uploaded already
                 if (offset == input.Length)
                 {
+                    response.name = "uploaded";
                     return response;
                 }
-                int bytesRemaining = (int)input.Length - offset;  // offset is subtracted to account for partial uploads
-                input.Position = (int)input.Length - bytesRemaining;
-                while (true)
+                long bytesRemaining = (long)input.Length - offset;  // offset is subtracted to account for partial uploads
+                input.Position = input.Length - bytesRemaining;
+                int readError = 0;
+                byte[] oldBuffer = new byte[BUFFER_SIZE];
+                // Make sure cancelation has not been requested by pause button
+                while (isPaused != true)
                 {
                     if (bytesRemaining > 0)  // Will read until file is completely read
                     {
-                        int size = Math.Min(bytesRemaining, chunkSize);
+                        int size = (int)Math.Min(bytesRemaining, (long)chunkSize);
                         buffer = new byte[size];
-                        int bytesRead = input.Read(buffer, 0, size);  // Store bytes in buffer, start at offset of index, read full chunksize worth of bytes minus what is already read
+                        long bytesRead;
+                        try
+                        {
+                            bytesRead = input.Read(buffer, 0, size);  // Store bytes in buffer, start at offset of index, read full chunksize worth of bytes minus what is already read
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex.Message);
+                            bytesRead = 0;
+                            readError++;
+                            if (readError >= 3)
+                            {
+                                Debug.WriteLine("Error reading from stream");
+                                Task f = AsyncAlert("Error sending file, try again", "error");
+                                break;
+                            }
+                        }
                         if (bytesRead == 0)  // Error - Read() returns 0 if nothing is read
                         {
                             break;
@@ -421,36 +580,53 @@ namespace SeaweedTestMk2
                     // If offset is not 0, there is no error, upload chunk
                     if (offset != 0) // Our previous chunk may have been the last one
                     {
+                        if (buffer == oldBuffer)
+                        {
+                            // No new data was read from stream
+                            continue;
+                        }
+                        // Set old buffer to current buffer for next iteration
+                        oldBuffer = buffer;
                         int retryCount = 0;
                         while (retryCount < 6)  // 5 retries
                         {
                             response = UploadChunk(buffer, fileName);
-                            if (response != null)
+                            if (response.name != null)
                             {
-                                //chunkNum++;
+                                Task g = AsyncAlert("Successful chunk: " + chunkNum, "success");
+                                if (progress != null)
+                                {
+                                    int amount = ProgressBarTick(buffer.Length);
+                                    progress.Report(amount);
+                                }
                                 break;  // Exit if response is good
                             }
-                                
                             else
                             {
+                                alert = AsyncAlert("Failed, retry: " + retryCount, "error");
                                 retryCount++;
                             }
                         }
-                        if (response == null)  // If retries fail
+                        if (response.name == null)  // If retries fail
                         {
                             Debug.WriteLine("Chunk Upload Failed");
                             Debug.WriteLine("Chunk: ", chunkNum + 1);
                             // Alert user
-                            AlertUser("Upload Failed, please check your network connection and try again.", "error");
+                            alert = AsyncAlert("Upload Failed, please check your network connection and try again.", "error");
                             break;  // Exit loop to stop uploading chunks
                         }
                         chunkNum++;
                     }
-                    // If offset is not a full chunk size, there was no error, and there is no more data to read
-                    if (bytesRemaining == 0) // We didn't read a full chunk: done
+                    // When whole file is read, exit
+                    if (bytesRemaining == 0)
                     {
+                        //alert = AsyncAlert("Full chunk uploaded successfully", "success");
                         break;
                     }
+                }
+                if (isPaused == true)
+                {
+                    response.name = "paused";
                 }
                 return response;
             }
@@ -466,7 +642,7 @@ namespace SeaweedTestMk2
             {
                 // POST file to filer
                 // Can split folders by username here
-                var client = new RestClient(filer_ip + "/" + folder_name);  // Filer IP 
+                var client = new RestClient(filer_ip + "/" + folder_name + "?maxMB=10");  // Filer IP 
                 var request = new RestRequest();
                 // Prep headers for filer
                 request.AddHeader("Content-Type", "multipart/form-data");
@@ -486,6 +662,7 @@ namespace SeaweedTestMk2
                     if (jResponse.ContainsKey("name"))
                     {
                         responseObj = JsonConvert.DeserializeObject<FilerPostResp>(content);
+                        AlertUser("Upload Successful", "success");
                     }
                     else
                     {
@@ -528,7 +705,7 @@ namespace SeaweedTestMk2
             {
                 // POST file to filer
                 // Can split folders by username here
-                var client = new RestClient(filer_ip + "/" + folder_name + "?op=append");  // tag "op"(operation) = append
+                var client = new RestClient(filer_ip + "/" + folder_name + "?op=append&maxMB=10");  // tag "op"(operation) = append
                 var request = new RestRequest();
                 // Prep headers for filer
                 request.AddHeader("Content-Type", "multipart/form-data");
@@ -576,6 +753,7 @@ namespace SeaweedTestMk2
 
         public FilerGetMetadata GetFileMetadata(string fileName)
         {
+            
             // Link to file requesting metadata
             var client = new RestClient(filer_ip + "/" + folder_name + "/" + fileName + "?metadata=true&pretty=yes");  // Filer IP
             var request = new RestRequest();
@@ -646,11 +824,11 @@ namespace SeaweedTestMk2
             pnlUploadFiles.BringToFront();
         }
 
-        private void btnViewFiles_Click(object sender, EventArgs e)
+        private async void btnViewFiles_Click(object sender, EventArgs e)
         {
             pbDisplayImage.ImageLocation = null;
             pnlViewFiles.BringToFront();
-            DownloadAll();
+            await CallDownload().Result;
             ShowAllImages();
             lvImages.Refresh();
         }
@@ -716,6 +894,19 @@ namespace SeaweedTestMk2
         {
             // Close everything
             Application.Exit();
+        }
+
+        private void btnPause_Click(object sender, EventArgs e)
+        {
+            isPaused = !isPaused;
+            if (isPaused)
+            {
+                AlertUser("Paused", "success");
+            }
+            else
+            {
+                AlertUser("UnPaused", "success");
+            }
         }
     }
 }

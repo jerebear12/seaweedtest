@@ -33,6 +33,7 @@
             this.btnUploadFiles = new System.Windows.Forms.Button();
             this.btnViewFiles = new System.Windows.Forms.Button();
             this.pnlUploadFiles = new System.Windows.Forms.Panel();
+            this.btnPause = new System.Windows.Forms.Button();
             this.txtFileInfo = new System.Windows.Forms.TextBox();
             this.btnClear = new System.Windows.Forms.Button();
             this.btnChoose = new System.Windows.Forms.Button();
@@ -53,6 +54,7 @@
             this.pbDisplayImage = new System.Windows.Forms.PictureBox();
             this.pnlPicture = new System.Windows.Forms.Panel();
             this.btnClose = new System.Windows.Forms.Button();
+            this.pbUpload = new System.Windows.Forms.ProgressBar();
             this.pnlNavigation.SuspendLayout();
             this.pnlUploadFiles.SuspendLayout();
             this.gbRadioButtons.SuspendLayout();
@@ -96,6 +98,8 @@
             // 
             // pnlUploadFiles
             // 
+            this.pnlUploadFiles.Controls.Add(this.pbUpload);
+            this.pnlUploadFiles.Controls.Add(this.btnPause);
             this.pnlUploadFiles.Controls.Add(this.txtFileInfo);
             this.pnlUploadFiles.Controls.Add(this.btnClear);
             this.pnlUploadFiles.Controls.Add(this.btnChoose);
@@ -106,6 +110,19 @@
             this.pnlUploadFiles.Size = new System.Drawing.Size(348, 565);
             this.pnlUploadFiles.TabIndex = 2;
             this.pnlUploadFiles.Click += new System.EventHandler(this.pnlUploadFiles_Click);
+            // 
+            // btnPause
+            // 
+            this.btnPause.BackColor = System.Drawing.Color.IndianRed;
+            this.btnPause.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPause.ForeColor = System.Drawing.Color.White;
+            this.btnPause.Location = new System.Drawing.Point(141, 339);
+            this.btnPause.Name = "btnPause";
+            this.btnPause.Size = new System.Drawing.Size(75, 29);
+            this.btnPause.TabIndex = 10;
+            this.btnPause.Text = "Pause";
+            this.btnPause.UseVisualStyleBackColor = false;
+            this.btnPause.Click += new System.EventHandler(this.btnPause_Click);
             // 
             // txtFileInfo
             // 
@@ -123,7 +140,7 @@
             this.btnClear.ForeColor = System.Drawing.Color.White;
             this.btnClear.Location = new System.Drawing.Point(54, 338);
             this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(120, 29);
+            this.btnClear.Size = new System.Drawing.Size(75, 29);
             this.btnClear.TabIndex = 8;
             this.btnClear.Text = "Clear";
             this.btnClear.UseVisualStyleBackColor = false;
@@ -133,9 +150,9 @@
             this.btnChoose.BackColor = System.Drawing.SystemColors.MenuHighlight;
             this.btnChoose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnChoose.ForeColor = System.Drawing.Color.White;
-            this.btnChoose.Location = new System.Drawing.Point(180, 338);
+            this.btnChoose.Location = new System.Drawing.Point(225, 339);
             this.btnChoose.Name = "btnChoose";
-            this.btnChoose.Size = new System.Drawing.Size(120, 29);
+            this.btnChoose.Size = new System.Drawing.Size(75, 29);
             this.btnChoose.TabIndex = 7;
             this.btnChoose.Text = "Choose";
             this.btnChoose.UseVisualStyleBackColor = false;
@@ -294,6 +311,16 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
+            // pbUpload
+            // 
+            this.pbUpload.Location = new System.Drawing.Point(54, 374);
+            this.pbUpload.Name = "pbUpload";
+            this.pbUpload.Size = new System.Drawing.Size(246, 23);
+            this.pbUpload.Step = 1;
+            this.pbUpload.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.pbUpload.TabIndex = 11;
+            this.pbUpload.Visible = false;
+            // 
             // FileManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -305,6 +332,7 @@
             this.Controls.Add(this.pnlError);
             this.Controls.Add(this.pnlSuccess);
             this.Controls.Add(this.pnlNavigation);
+            this.MaximumSize = new System.Drawing.Size(365, 674);
             this.Name = "FileManager";
             this.Text = "FileManager";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FileManager_FormClosed);
@@ -349,5 +377,7 @@
         private Panel pnlPicture;
         private Button btnClose;
         private PictureBox pbDisplayImage;
+        private Button btnPause;
+        private ProgressBar pbUpload;
     }
 }

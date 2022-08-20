@@ -8,6 +8,7 @@ F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\bin\Debug\net6.0-windows\Re
 F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\SeaweedTestMk2.csproj.AssemblyReference.cache
 F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\SeaweedTestMk2.FileManager.resources
 F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\SeaweedTestMk2.formLogin.resources
+F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\SeaweedTestMk2.Properties.Resources.resources
 F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\SeaweedTestMk2.csproj.GenerateResource.cache
 F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\SeaweedTestMk2.GeneratedMSBuildEditorConfig.editorconfig
 F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\SeaweedTestMk2.AssemblyInfoInputs.cache
@@ -19,4 +20,3 @@ F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\re
 F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\SeaweedTestMk2.pdb
 F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\SeaweedTestMk2.genruntimeconfig.cache
 F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\ref\SeaweedTestMk2.dll
-F:\FirstStep\FirstTest\SeaweedTestMk2\SeaweedTestMk2\obj\Debug\net6.0-windows\SeaweedTestMk2.Properties.Resources.resources
