@@ -89,15 +89,18 @@ These are the instructions for installation and operation
 
 ### Prerequisites
 
+- Pip installed on your machine[^1]
 - Python installed on your machine
-- Visual Studio with .Net6.0 or later
+- Visual Studio with .Net6.0 or later[^2]
+- An instance of the python flask server to log in and authenticate the user - located in the flask-server folder
 - An instance of seaweedfs running with a master, volume, and filer: [How To](https://github.com/seaweedfs/seaweedfs/wiki/Getting-Started)
 - The Filer will have to be running with a security.toml file: [Info](https://github.com/seaweedfs/seaweedfs/wiki/Security-Overview#jwt-based-access-control)
 - The secret(encryption) key used in this application can be viewed and changed in the app.py file
 - The timeout of the secret key *has to be the same in app.py and security.toml*
 - Both read and write signing_key(s) are recommended
 
-You will need to install the python flask server to log in and authenticate the user:
+[^1]: pip is automatically installed with Python!
+[^2]: you can skip this step by installing the application from the .exe file in the Application folder!
 
 ### Installation
 
@@ -116,7 +119,7 @@ This will install all python packages needed to run app.py
 
 1. Run SeaweedFS as described in [Prerequisites](https://github.com/jerebear12/seaweedtest#Prerequisites)
 2. Run app.py - the single file flask server that handles user auth - as described in [Prerequisites](https://github.com/jerebear12/seaweedtest#Prerequisites)
-3. Start SeaweedTestMk2.proj from Visual Studio
+3. Start SeaweedTestMk2.proj from Visual Studio - or run SeaweedTest as installed by the setup wizard
 4. Set and save API and Filer ip addresses in 'Settings'(top right hand corner)
 5. Sign up
 6. Log in
