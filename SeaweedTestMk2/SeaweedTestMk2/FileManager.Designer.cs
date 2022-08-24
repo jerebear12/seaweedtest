@@ -29,10 +29,12 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FileManager));
             this.pnlNavigation = new System.Windows.Forms.Panel();
             this.btnUploadFiles = new System.Windows.Forms.Button();
             this.btnViewFiles = new System.Windows.Forms.Button();
             this.pnlUploadFiles = new System.Windows.Forms.Panel();
+            this.pbUpload = new System.Windows.Forms.ProgressBar();
             this.btnPause = new System.Windows.Forms.Button();
             this.txtFileInfo = new System.Windows.Forms.TextBox();
             this.btnClear = new System.Windows.Forms.Button();
@@ -41,6 +43,7 @@
             this.rbFile = new System.Windows.Forms.RadioButton();
             this.rbFolder = new System.Windows.Forms.RadioButton();
             this.lblUpHeader = new System.Windows.Forms.Label();
+            this.btnLogOut = new System.Windows.Forms.Button();
             this.ofdFile = new System.Windows.Forms.OpenFileDialog();
             this.fbdFolder = new System.Windows.Forms.FolderBrowserDialog();
             this.pnlSuccess = new System.Windows.Forms.Panel();
@@ -49,12 +52,11 @@
             this.lblError = new System.Windows.Forms.Label();
             this.pnlViewFiles = new System.Windows.Forms.Panel();
             this.lvImages = new System.Windows.Forms.ListView();
-            this.lblDownHeader = new System.Windows.Forms.Label();
             this.ilImages = new System.Windows.Forms.ImageList(this.components);
+            this.lblDownHeader = new System.Windows.Forms.Label();
             this.pbDisplayImage = new System.Windows.Forms.PictureBox();
             this.pnlPicture = new System.Windows.Forms.Panel();
             this.btnClose = new System.Windows.Forms.Button();
-            this.pbUpload = new System.Windows.Forms.ProgressBar();
             this.pnlNavigation.SuspendLayout();
             this.pnlUploadFiles.SuspendLayout();
             this.gbRadioButtons.SuspendLayout();
@@ -98,6 +100,7 @@
             // 
             // pnlUploadFiles
             // 
+            this.pnlUploadFiles.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.pnlUploadFiles.Controls.Add(this.pbUpload);
             this.pnlUploadFiles.Controls.Add(this.btnPause);
             this.pnlUploadFiles.Controls.Add(this.txtFileInfo);
@@ -111,14 +114,24 @@
             this.pnlUploadFiles.TabIndex = 2;
             this.pnlUploadFiles.Click += new System.EventHandler(this.pnlUploadFiles_Click);
             // 
+            // pbUpload
+            // 
+            this.pbUpload.Location = new System.Drawing.Point(54, 374);
+            this.pbUpload.Name = "pbUpload";
+            this.pbUpload.Size = new System.Drawing.Size(246, 23);
+            this.pbUpload.Step = 1;
+            this.pbUpload.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.pbUpload.TabIndex = 11;
+            this.pbUpload.Visible = false;
+            // 
             // btnPause
             // 
             this.btnPause.BackColor = System.Drawing.Color.IndianRed;
             this.btnPause.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPause.ForeColor = System.Drawing.Color.White;
-            this.btnPause.Location = new System.Drawing.Point(141, 339);
+            this.btnPause.Location = new System.Drawing.Point(140, 337);
             this.btnPause.Name = "btnPause";
-            this.btnPause.Size = new System.Drawing.Size(75, 29);
+            this.btnPause.Size = new System.Drawing.Size(75, 30);
             this.btnPause.TabIndex = 10;
             this.btnPause.Text = "Pause";
             this.btnPause.UseVisualStyleBackColor = false;
@@ -138,7 +151,7 @@
             this.btnClear.BackColor = System.Drawing.SystemColors.WindowFrame;
             this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClear.ForeColor = System.Drawing.Color.White;
-            this.btnClear.Location = new System.Drawing.Point(54, 338);
+            this.btnClear.Location = new System.Drawing.Point(54, 337);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(75, 29);
             this.btnClear.TabIndex = 8;
@@ -150,9 +163,9 @@
             this.btnChoose.BackColor = System.Drawing.SystemColors.MenuHighlight;
             this.btnChoose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnChoose.ForeColor = System.Drawing.Color.White;
-            this.btnChoose.Location = new System.Drawing.Point(225, 339);
+            this.btnChoose.Location = new System.Drawing.Point(225, 337);
             this.btnChoose.Name = "btnChoose";
-            this.btnChoose.Size = new System.Drawing.Size(75, 29);
+            this.btnChoose.Size = new System.Drawing.Size(75, 30);
             this.btnChoose.TabIndex = 7;
             this.btnChoose.Text = "Choose";
             this.btnChoose.UseVisualStyleBackColor = false;
@@ -201,6 +214,18 @@
             this.lblUpHeader.TabIndex = 0;
             this.lblUpHeader.Text = "Upload Manager";
             // 
+            // btnLogOut
+            // 
+            this.btnLogOut.BackColor = System.Drawing.Color.Transparent;
+            this.btnLogOut.BackgroundImage = global::SeaweedTestMk2.Properties.Resources.logout;
+            this.btnLogOut.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnLogOut.Location = new System.Drawing.Point(313, 6);
+            this.btnLogOut.Name = "btnLogOut";
+            this.btnLogOut.Size = new System.Drawing.Size(28, 26);
+            this.btnLogOut.TabIndex = 21;
+            this.btnLogOut.UseVisualStyleBackColor = false;
+            this.btnLogOut.Click += new System.EventHandler(this.btnLogOut_Click);
+            // 
             // ofdFile
             // 
             this.ofdFile.Title = "Add File";
@@ -247,6 +272,7 @@
             this.lblError.Name = "lblError";
             this.lblError.Size = new System.Drawing.Size(160, 22);
             this.lblError.TabIndex = 16;
+            this.lblError.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // pnlViewFiles
             // 
@@ -259,13 +285,21 @@
             // 
             // lvImages
             // 
+            this.lvImages.GroupImageList = this.ilImages;
             this.lvImages.Location = new System.Drawing.Point(4, 104);
             this.lvImages.MultiSelect = false;
             this.lvImages.Name = "lvImages";
             this.lvImages.Size = new System.Drawing.Size(341, 462);
             this.lvImages.TabIndex = 2;
             this.lvImages.UseCompatibleStateImageBehavior = false;
+            this.lvImages.View = System.Windows.Forms.View.List;
             this.lvImages.Click += new System.EventHandler(this.lvImages_Click);
+            // 
+            // ilImages
+            // 
+            this.ilImages.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.ilImages.ImageSize = new System.Drawing.Size(16, 16);
+            this.ilImages.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // lblDownHeader
             // 
@@ -276,12 +310,6 @@
             this.lblDownHeader.Size = new System.Drawing.Size(86, 21);
             this.lblDownHeader.TabIndex = 1;
             this.lblDownHeader.Text = "View Files";
-            // 
-            // ilImages
-            // 
-            this.ilImages.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.ilImages.ImageSize = new System.Drawing.Size(16, 16);
-            this.ilImages.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // pbDisplayImage
             // 
@@ -311,27 +339,19 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // pbUpload
-            // 
-            this.pbUpload.Location = new System.Drawing.Point(54, 374);
-            this.pbUpload.Name = "pbUpload";
-            this.pbUpload.Size = new System.Drawing.Size(246, 23);
-            this.pbUpload.Step = 1;
-            this.pbUpload.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.pbUpload.TabIndex = 11;
-            this.pbUpload.Visible = false;
-            // 
             // FileManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(349, 635);
+            this.Controls.Add(this.btnLogOut);
             this.Controls.Add(this.pnlUploadFiles);
             this.Controls.Add(this.pnlViewFiles);
             this.Controls.Add(this.pnlPicture);
             this.Controls.Add(this.pnlError);
             this.Controls.Add(this.pnlSuccess);
             this.Controls.Add(this.pnlNavigation);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(365, 674);
             this.Name = "FileManager";
             this.Text = "FileManager";
@@ -379,5 +399,6 @@
         private PictureBox pbDisplayImage;
         private Button btnPause;
         private ProgressBar pbUpload;
+        private Button btnLogOut;
     }
 }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formLogin));
             this.lblLogin = new System.Windows.Forms.Label();
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.pnlUsername = new System.Windows.Forms.Panel();
@@ -101,7 +102,7 @@
             // 
             // pnlUsername
             // 
-            this.pnlUsername.BackColor = System.Drawing.Color.LightGray;
+            this.pnlUsername.BackColor = System.Drawing.Color.DarkGray;
             this.pnlUsername.Location = new System.Drawing.Point(9, 129);
             this.pnlUsername.Name = "pnlUsername";
             this.pnlUsername.Size = new System.Drawing.Size(248, 3);
@@ -109,7 +110,7 @@
             // 
             // pnlPassword
             // 
-            this.pnlPassword.BackColor = System.Drawing.Color.LightGray;
+            this.pnlPassword.BackColor = System.Drawing.Color.DarkGray;
             this.pnlPassword.Location = new System.Drawing.Point(9, 182);
             this.pnlPassword.Name = "pnlPassword";
             this.pnlPassword.Size = new System.Drawing.Size(248, 3);
@@ -222,7 +223,7 @@
             // 
             // panel4
             // 
-            this.panel4.BackColor = System.Drawing.Color.LightGray;
+            this.panel4.BackColor = System.Drawing.Color.DarkGray;
             this.panel4.Location = new System.Drawing.Point(9, 236);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(248, 3);
@@ -285,7 +286,7 @@
             // 
             // pnlDividerTop
             // 
-            this.pnlDividerTop.BackColor = System.Drawing.Color.LightGray;
+            this.pnlDividerTop.BackColor = System.Drawing.Color.DarkGray;
             this.pnlDividerTop.Location = new System.Drawing.Point(9, 129);
             this.pnlDividerTop.Name = "pnlDividerTop";
             this.pnlDividerTop.Size = new System.Drawing.Size(248, 3);
@@ -317,7 +318,7 @@
             // 
             // pnlDividerBot
             // 
-            this.pnlDividerBot.BackColor = System.Drawing.Color.LightGray;
+            this.pnlDividerBot.BackColor = System.Drawing.Color.DarkGray;
             this.pnlDividerBot.Location = new System.Drawing.Point(9, 183);
             this.pnlDividerBot.Name = "pnlDividerBot";
             this.pnlDividerBot.Size = new System.Drawing.Size(248, 3);
@@ -533,11 +534,12 @@
             this.ClientSize = new System.Drawing.Size(296, 410);
             this.Controls.Add(this.btnSettings);
             this.Controls.Add(this.pnlLogin);
+            this.Controls.Add(this.pnlSignUp);
             this.Controls.Add(this.pnlSettings);
             this.Controls.Add(this.pnlLoading);
-            this.Controls.Add(this.pnlSignUp);
             this.Controls.Add(this.pnlSuccess);
             this.Controls.Add(this.pnlError);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "formLogin";
             this.Text = "Login";
             this.Activated += new System.EventHandler(this.formLogin_Activated);

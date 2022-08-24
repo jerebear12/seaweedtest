@@ -147,7 +147,19 @@ namespace SeaweedTestMk2
         {
             if (!string.IsNullOrEmpty(api_ip))
             {
-                var client = new RestClient(api_ip);  // API IP
+                var client = new RestClient();
+                try
+                {
+                    client = new RestClient(api_ip);
+                }
+                catch (Exception ex)
+                {
+                    pnlError.BringToFront();
+                    lblError.Text = "";
+                    lblError.Text = "Error Sending Request";
+                    Thread.Sleep(1000);
+                    return false;
+                }
                 var request = new RestRequest();
                 // Get response from server
                 RestResponse response = null;
@@ -266,14 +278,14 @@ namespace SeaweedTestMk2
 
                     };
                     request.AddJsonBody(json);
-                    //request.AddFile("file", path);
+                    // request.AddFile("file", path);
                     // Get response from server
                     var response = client.Post(request);
                     // response to string
                     var content = response.Content;
                     if (content != null)
                     {
-                        //JObject jResponse = JObject.Parse(content);
+                        // JObject jResponse = JObject.Parse(content);
                         // Instantiate class to hold json data as properties for easy access
                         PyAPIResp responseToken = JsonConvert.DeserializeObject<PyAPIResp>(content);
                         Debug.WriteLine(content);
@@ -623,7 +635,7 @@ namespace SeaweedTestMk2
             if (!string.IsNullOrEmpty(loaded_folder_name))
             {
                 folder_name = loaded_folder_name;
-                txtFilerIP.Text = folder_name;
+                txtFolder.Text = folder_name;
             }
         }
 
